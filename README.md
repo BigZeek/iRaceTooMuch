@@ -9,7 +9,7 @@ Frontend/UI: Streamlit
 
 Backend/Data Handling: Python (Pandas, Numpy, Matplotlib/Plotly)
 
-Data Source: Exported data from [Garage61}(https://garage61.net/app)
+Data Source: Exported data from [Garage61](https://garage61.net/app)
 
 How to see your own stats:
 1) Clone this repository.
