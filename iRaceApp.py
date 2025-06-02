@@ -74,9 +74,9 @@ st.title("Most Driven Car:")
 
 match most_driven_car:
         case "Ferrari 296 GT3":
-                car_image_string = "assets\Ferrari296GT3-feature-1-1024x576.jpg"
+                car_image_string = "assets/Ferrari296GT3-feature-1-1024x576.jpg"
         case "Mercedes-AMG GT4":
-                car_image_string = "assets\Mercedes-AMG-GT4-1024x576.jpg"
+                car_image_string = "assets/Mercedes-AMG-GT4-1024x576.jpg"
 
 st.image(car_image_string, caption=most_driven_car)
 
