@@ -20,9 +20,12 @@ most_driven_track = tracks_driven.loc[tracks_driven["Laps driven"].idxmax(), "Tr
 hours_on_track = activity_by_day['Hours on track'].sum().round(2)
 
 st.title('iRaceTooMuch')
-
-st.metric("Total Laps:",total_laps)
-st.metric("Clean Laps:", total_clean_laps)
+col1, col2 = st.columns(2)
+with col1: 
+        st.metric("Total Laps:",total_laps)
+with col2: 
+        st.metric("Clean Laps:", total_clean_laps)
+        
 st.metric("Hours on Track:", hours_on_track)
 st.metric("Most Driven Track:", most_driven_track)
 
