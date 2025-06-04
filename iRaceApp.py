@@ -114,8 +114,8 @@ session_data = pd.read_excel(racing_data, 'Raw driving data')
 grouped = driving_data.groupby("Session type")
 total_session_laps = grouped["Laps driven"].sum().sort_values(ascending=False)
 
-session_laps_plot = px.bar(total_session_laps, title="Total Laps by Session Type", color=total_session_laps, color_continuous_scale=["blue","red"])
-st.plotly_chart(session_laps_plot)
+#session_laps_plot = px.bar(total_session_laps, title="Total Laps by Session Type", color=total_session_laps, color_continuous_scale=["blue","red"])
+st.bar_chart(total_session_laps)
 
 st.markdown("---")
 
