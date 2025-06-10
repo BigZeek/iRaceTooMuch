@@ -1,3 +1,5 @@
+[![wakatime](https://wakatime.com/badge/user/af3e8694-2222-4de2-a458-248b84236d83/project/2887c89c-1602-4733-874e-aaf8b3e19471.svg)](https://wakatime.com/badge/user/af3e8694-2222-4de2-a458-248b84236d83/project/2887c89c-1602-4733-874e-aaf8b3e19471)
+
 🏁 iRacing Career Stats Viewer
 ---
 A simple and interactive Streamlit web application to visualize and track iRacing career statistics. 
