@@ -4,6 +4,80 @@ import plotly.express as px
 import altair as alt
 import requests
 
+### Functions ###
+def display_individual_discipline():
+        iRating = pd.read_excel(racing_data, iRatingData)
+        startDate = iRating['Date'][1].date()
+        endDate = iRating['Date'].iloc[-1].date()
+        st.write("From ", startDate, "to ", endDate)
+
+        current_iRating = iRating['iRating'].iloc[-1]
+
+        st.title("iRating")
+        st.metric("Current iRating:", current_iRating)
+        iRChart = (alt.Chart(iRating)
+                .mark_line()
+                .encode(alt.Y('iRating').scale(zero=False), x='Date')
+                )
+
+        st.altair_chart(iRChart, use_container_width=True)
+
+        safetyRating = pd.read_excel(racing_data, safetyRatingData)
+        st.title("Safety Rating")
+        current_safety_rating = safetyRating['Safety Rating'].iloc[-1]
+        st.metric("Current Safety Rating:", current_safety_rating)
+        SRchart = (alt.Chart(safetyRating)
+                .mark_line()
+                .encode(alt.Y('Safety Rating (raw)').scale(zero=False), x='Date')
+                )
+
+        st.altair_chart(SRchart, use_container_width=True)
+        iRating['Date'] = iRating['Date'].dt.date
+        
+def display_combined_discipline_data():
+        ir_sheets = [s for s in racing_data.sheet_names if s.startswith("IR (")]
+        sr_sheets = [s for s in racing_data.sheet_names if s.startswith("SR (")]
+        
+        all_ir_data = []
+        for sheet in ir_sheets:
+            discipline = sheet.split("(")[1].split(" -")[0]
+            df = pd.read_excel(racing_data, sheet_name=sheet)
+            df.columns = df.columns.str.strip()
+            df = df[["Date", "iRating"]]  
+            df["Discipline"] = discipline
+            all_ir_data.append(df)
+
+        combined_ir_df = pd.concat(all_ir_data)
+        fig = px.line(
+            combined_ir_df,
+            x="Date",
+            y="iRating",
+            color="Discipline",
+            title="iRating All Disciplines"
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+        
+        all_sr_data = []
+        for sheet in sr_sheets:
+            discipline = sheet.split("(")[1].split(" -")[0]
+            df = pd.read_excel(racing_data, sheet_name=sheet)
+            df.columns = df.columns.str.strip()
+            df = df[["Date", "Safety Rating (raw)"]]  
+            df["Discipline"] = discipline
+            all_sr_data.append(df)
+        
+        combined_sr_df = pd.concat(all_sr_data)
+        fig = px.line(
+            combined_sr_df,
+            x="Date",
+            y="Safety Rating (raw)",
+            color="Discipline",
+            title="Safety Rating All Disciplines"
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+
 racing_data = pd.ExcelFile("Garage 61 - Zak Groenewold - Statistics - 2025-06-04-09-23-08.xlsx") #Read entire file
 
 #Create dataframes from desired pages
@@ -34,54 +108,35 @@ st.write("Activity by Day", activity_by_day)
 st.write("Daily Activity")
 st.line_chart(data=activity_by_day, x='Date', y='Hours on track')
 
-disciplineSheet = st.selectbox("Racing Discipline", ("Sports Car", "Formula Car", "Oval", "Dirt Oval", "Dirt Road"))
+#iRating and Safety rating visualizations
+disciplineSheet = st.selectbox("Racing Discipline", ("Sports Car", "Formula Car", "Oval", "Dirt Oval", "Dirt Road", "All Disciplines"))
 match disciplineSheet:
         case "Sports Car": 
-                iRatingSheet = "IR (Sports Car - Zachery Groen)"
-                safetyRatingSheet = "SR (Sports Car - Zachery Groen)"
+                iRatingData = "IR (Sports Car - Zachery Groen)"
+                safetyRatingData = "SR (Sports Car - Zachery Groen)"
+                display_individual_discipline()
         case "Formula Car":
-                iRatingSheet = "IR (Formula Car - Zachery Groe)"
-                safetyRatingSheet = "SR (Formula Car - Zachery Groe)"
+                iRatingData = "IR (Formula Car - Zachery Groe)"
+                safetyRatingData = "SR (Formula Car - Zachery Groe)"
+                display_individual_discipline()
         case "Oval":
-                iRatingSheet = "IR (Oval - Zachery Groenewold)"
-                safetyRatingSheet= "SR (Oval - Zachery Groenewold)"
+                iRatingData = "IR (Oval - Zachery Groenewold)"
+                safetyRatingData= "SR (Oval - Zachery Groenewold)"
+                display_individual_discipline()
         case "Dirt Oval":
-                iRatingSheet = "IR (Dirt Oval - Zachery Groene)"
-                safetyRatingSheet = "SR (Dirt Oval - Zachery Groene)"
+                iRatingData = "IR (Dirt Oval - Zachery Groene)"
+                safetyRatingData = "SR (Dirt Oval - Zachery Groene)"
+                display_individual_discipline()
         case "Dirt Road":
-                iRatingSheet = "IR (Dirt Road - Zachery Groene)"
-                safetyRatingSheet = "SR (Dirt Road - Zachery Groene)"
-                
+                iRatingData = "IR (Dirt Road - Zachery Groene)"
+                safetyRatingData = "SR (Dirt Road - Zachery Groene)"
+                display_individual_discipline()
+        case "All Disciplines":
+                st.write("Note: Road license has been retired as of March 2024.")
+                display_combined_discipline_data()
+        
 
-iRating = pd.read_excel(racing_data, iRatingSheet)
-startDate = iRating['Date'][1].date()
-endDate = iRating['Date'].iloc[-1].date()
-st.write("From ", startDate, "to ", endDate)
-
-current_iRating = iRating['iRating'].iloc[-1]
-
-st.title("Discipline iRating")
-st.metric("Current iRating:", current_iRating)
-iRChart = (alt.Chart(iRating)
-           .mark_line()
-           .encode(alt.Y('iRating').scale(zero=False), x='Date')
-           )
-
-st.altair_chart(iRChart, use_container_width=True)
-
-safetyRating = pd.read_excel(racing_data, safetyRatingSheet)
-st.title("Discipline Safety Rating")
-current_safety_rating = safetyRating['Safety Rating'].iloc[-1]
-st.metric("Current Safety Rating:", current_safety_rating)
-SRchart = (alt.Chart(safetyRating)
-        .mark_line()
-        .encode(alt.Y('Safety Rating (raw)').scale(zero=False), x='Date')
-        )
-
-st.altair_chart(SRchart, use_container_width=True)
-iRating['Date'] = iRating['Date'].dt.date
-
-
+#Car use visualizations
 car_type = pd.read_excel(racing_data, 'Popular cars')
 car_label = car_type['Car']
 car_laps = car_type['Laps driven']
@@ -117,7 +172,7 @@ session_data = pd.read_excel(racing_data, 'Raw driving data')
 grouped = driving_data.groupby("Session type")
 total_session_laps = grouped["Laps driven"].sum().sort_values(ascending=False)
 st.dataframe(total_session_laps)
-#session_laps_plot = px.bar(total_session_laps, title="Total Laps by Session Type", color=total_session_laps, color_continuous_scale=["blue","red"])
+
 st.bar_chart(total_session_laps)
 
 st.markdown("---")
@@ -141,7 +196,6 @@ st.markdown("🔗 View this project on GitHub")
 st.markdown(
     "[![GitHub](https://img.shields.io/badge/GitHub-Repo-blue?logo=github)](https://github.com/BigZeek/iRaceTooMuch)"
 )
-
 
 owner = "BigZeek"
 repo = "iRaceTooMuch"
