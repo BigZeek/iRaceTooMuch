@@ -48,8 +48,18 @@ def display_combined_discipline_data():
             all_ir_data.append(df)
 
         combined_ir_df = pd.concat(all_ir_data)
+        disciplines = combined_ir_df["Discipline"].unique()
+        
+        selected_disciplines = st.multiselect(
+                "Select disciplines to display:",
+                options=sorted(disciplines),
+                default=sorted(disciplines)
+        )
+        
+        filtered_ir_df = combined_ir_df[combined_ir_df["Discipline"].isin(selected_disciplines)]
+        
         fig = px.line(
-            combined_ir_df,
+            filtered_ir_df,
             x="Date",
             y="iRating",
             color="Discipline",
@@ -68,8 +78,12 @@ def display_combined_discipline_data():
             all_sr_data.append(df)
         
         combined_sr_df = pd.concat(all_sr_data)
+        disciplines = combined_sr_df["Discipline"].unique()
+        
+        filtered_sr_df = combined_sr_df[combined_sr_df["Discipline"].isin(selected_disciplines)]
+        
         fig = px.line(
-            combined_sr_df,
+            filtered_sr_df,
             x="Date",
             y="Safety Rating (raw)",
             color="Discipline",
@@ -78,7 +92,7 @@ def display_combined_discipline_data():
         
         st.plotly_chart(fig, use_container_width=True)
 
-racing_data = pd.ExcelFile("Garage 61 - Zak Groenewold - Statistics - 2025-06-04-09-23-08.xlsx") #Read entire file
+racing_data = pd.ExcelFile("Garage 61 - Zak Groenewold - Statistics - 2025-06-15-17-20-02.xlsx") #Read entire file
 
 #Create dataframes from desired pages
 activity_by_day = pd.read_excel(racing_data, 'Activity', parse_dates=['Date'])
@@ -92,20 +106,23 @@ total_clean_laps = activity_by_day['Clean laps'].sum()
 tracks_driven = pd.read_excel(racing_data, 'Popular tracks')
 most_driven_track = tracks_driven.loc[tracks_driven["Laps driven"].idxmax(), "Track"]
 hours_on_track = activity_by_day['Hours on track'].sum().round(2)
+clean_lap_value = total_clean_laps/total_laps
+clean_lap_percentage = f"{clean_lap_value:.0%}"
 
 st.title('iRaceTooMuch')
 col1, col2 = st.columns(2)
 with col1: 
         st.metric("Total Laps:",total_laps)
+        st.metric("Hours on Track:", hours_on_track)
 with col2: 
         st.metric("Clean Laps:", total_clean_laps)
+        st.metric("Clean Lap %: ", clean_lap_percentage)
         
-st.metric("Hours on Track:", hours_on_track)
 st.metric("Most Driven Track:", most_driven_track)
 
 
 st.write("Activity by Day", activity_by_day)
-st.write("Daily Activity")
+st.write("Daily Hours on Track")
 st.line_chart(data=activity_by_day, x='Date', y='Hours on track')
 
 #iRating and Safety rating visualizations
@@ -132,7 +149,7 @@ match disciplineSheet:
                 safetyRatingData = "SR (Dirt Road - Zachery Groene)"
                 display_individual_discipline()
         case "All Disciplines":
-                st.write("Note: Road license has been retired as of March 2024.")
+                st.write("Note: Road license has been retired as of 2024.")
                 display_combined_discipline_data()
         
 
@@ -154,6 +171,8 @@ match most_driven_car:
                 car_image_string = "assets/Ferrari296GT3-feature-1-1024x576.jpg"
         case "Mercedes-AMG GT4":
                 car_image_string = "assets/Mercedes-AMG-GT4-1024x576.jpg"
+        case "Chevrolet Corvette Z06 GT3.R":
+                car_image_string = "assets\chevrolet-corvette-z06-gt3r-feature-1024x576.jpg"
         case "_":
                 st.write("No Available Image")
 
@@ -186,7 +205,7 @@ with st.expander("Why is Safety Rating displayed that way?"):
     st.write("Safety Rating has a raw score, but is more commonly read in licenses of A, B, C, D, and R (Rookie). \n More information can be found here: [Safety Rating Explained](https://support.iracing.com/support/solutions/articles/31000156960-iracing-how-to-safety-rating)")
 
 with st.expander("What is iRating?"):
-    st.write("A score based on an ELO type system developed by iRacing. Read about how it works here: [iRating Explained](https://support.iracing.com/support/solutions/articles/31000133523-what-is-irating)")
+    st.write("A driver skill score based on an ELO type system developed by iRacing. Read about how it works here: [iRating Explained](https://support.iracing.com/support/solutions/articles/31000133523-what-is-irating)")
 
 
 #Footer for GitHub repo and Latest Commit
@@ -215,3 +234,5 @@ if response.status_code == 200:
     st.markdown(f"🕒 Latest commit: [{sha}]({link}) — _{message}_ 🗓️ {date}")
 else:
     st.warning("Could not fetch latest commit info.")
+    
+    #https://members-ng.iracing.com/web/racing/profile?cust_id=1001966&tab=licenses
