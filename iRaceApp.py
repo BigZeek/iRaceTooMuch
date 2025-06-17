@@ -3,10 +3,11 @@ import pandas as pd
 import plotly.express as px
 import altair as alt
 import requests
+import data_loader as dl
 
 ### Functions ###
 def display_individual_discipline():
-        iRating = pd.read_excel(racing_data, iRatingData)
+        iRating = pd.read_excel(dl.racing_data, iRatingData)
         startDate = iRating['Date'][1].date()
         endDate = iRating['Date'].iloc[-1].date()
         st.write("From ", startDate, "to ", endDate)
@@ -22,7 +23,7 @@ def display_individual_discipline():
 
         st.altair_chart(iRChart, use_container_width=True)
 
-        safetyRating = pd.read_excel(racing_data, safetyRatingData)
+        safetyRating = pd.read_excel(dl.racing_data, safetyRatingData)
         st.title("Safety Rating")
         current_safety_rating = safetyRating['Safety Rating'].iloc[-1]
         st.metric("Current Safety Rating:", current_safety_rating)
@@ -35,13 +36,13 @@ def display_individual_discipline():
         iRating['Date'] = iRating['Date'].dt.date
         
 def display_combined_discipline_data():
-        ir_sheets = [s for s in racing_data.sheet_names if s.startswith("IR (")]
-        sr_sheets = [s for s in racing_data.sheet_names if s.startswith("SR (")]
+        ir_sheets = [s for s in dl.racing_data.sheet_names if s.startswith("IR (")]
+        sr_sheets = [s for s in dl.racing_data.sheet_names if s.startswith("SR (")]
         
         all_ir_data = []
         for sheet in ir_sheets:
             discipline = sheet.split("(")[1].split(" -")[0]
-            df = pd.read_excel(racing_data, sheet_name=sheet)
+            df = pd.read_excel(dl.racing_data, sheet_name=sheet)
             df.columns = df.columns.str.strip()
             df = df[["Date", "iRating"]]  
             df["Discipline"] = discipline
@@ -71,7 +72,7 @@ def display_combined_discipline_data():
         all_sr_data = []
         for sheet in sr_sheets:
             discipline = sheet.split("(")[1].split(" -")[0]
-            df = pd.read_excel(racing_data, sheet_name=sheet)
+            df = pd.read_excel(dl.racing_data, sheet_name=sheet)
             df.columns = df.columns.str.strip()
             df = df[["Date", "Safety Rating (raw)"]]  
             df["Discipline"] = discipline
@@ -92,10 +93,8 @@ def display_combined_discipline_data():
         
         st.plotly_chart(fig, use_container_width=True)
 
-racing_data = pd.ExcelFile("Garage 61 - Zak Groenewold - Statistics - 2025-06-15-17-20-02.xlsx") #Read entire file
-
 #Create dataframes from desired pages
-activity_by_day = pd.read_excel(racing_data, 'Activity', parse_dates=['Date'])
+activity_by_day = pd.read_excel(dl.racing_data, 'Activity', parse_dates=['Date'])
 activity_by_day['Date'] = activity_by_day['Date'].dt.date
 activity_by_day['Hours on track'] = activity_by_day['Hours on track'].round(2)
 activity_by_day['Clean laps %'] = activity_by_day['Clean laps %'].map("{:.2%}".format)
@@ -103,11 +102,12 @@ activity_by_day['Clean laps %'] = activity_by_day['Clean laps %'].map("{:.2%}".f
 #Get metric data
 total_laps = activity_by_day['Laps driven'].sum()
 total_clean_laps = activity_by_day['Clean laps'].sum()
-tracks_driven = pd.read_excel(racing_data, 'Popular tracks')
+tracks_driven = pd.read_excel(dl.racing_data, 'Popular tracks')
 most_driven_track = tracks_driven.loc[tracks_driven["Laps driven"].idxmax(), "Track"]
 hours_on_track = activity_by_day['Hours on track'].sum().round(2)
 clean_lap_value = total_clean_laps/total_laps
 clean_lap_percentage = f"{clean_lap_value:.0%}"
+
 
 st.title('iRaceTooMuch')
 col1, col2 = st.columns(2)
@@ -154,7 +154,7 @@ match disciplineSheet:
         
 
 #Car use visualizations
-car_type = pd.read_excel(racing_data, 'Popular cars')
+car_type = pd.read_excel(dl.racing_data, 'Popular cars')
 car_label = car_type['Car']
 car_laps = car_type['Laps driven']
 fig = px.pie(car_type, names=car_label, values=car_laps)
@@ -178,7 +178,7 @@ match most_driven_car:
 
 st.image(car_image_string, caption=most_driven_car)
 
-driving_data = pd.read_excel(racing_data, 'Raw driving data')
+driving_data = pd.read_excel(dl.racing_data, 'Raw driving data')
 grouped = driving_data.groupby("Track")
 total_track_laps = grouped["Laps driven"].sum().sort_values(ascending=False)
 st.title("Tracks Raced")
@@ -187,7 +187,7 @@ st.dataframe(data=total_track_laps, use_container_width=False, width=450)
 track_df = pd.read_csv("track_locations.csv", encoding = "cp1252", sep=",")
 st.map(track_df)
 
-session_data = pd.read_excel(racing_data, 'Raw driving data')
+session_data = pd.read_excel(dl.racing_data, 'Raw driving data')
 grouped = driving_data.groupby("Session type")
 total_session_laps = grouped["Laps driven"].sum().sort_values(ascending=False)
 st.dataframe(total_session_laps)
