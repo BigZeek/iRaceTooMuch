@@ -35,5 +35,4 @@ def check_track_locations(racing_data_path=racing_data, location_csv='track_loca
                 track_df.to_csv(location_csv, mode = 'a', header=False, index=False)
                 print(track_df)
 
-                
-check_track_locations('new_data.xlsx', 'test_track_locations.csv') #For local testing
+check_track_locations()
