@@ -27,4 +27,4 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run track location script
-      run: python scripts/data_loader.py  
+      run: python data_loader.py  

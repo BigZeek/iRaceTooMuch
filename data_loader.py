@@ -1,9 +1,9 @@
 import os
 import pandas as pd
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 from opencage.geocoder import OpenCageGeocode
 
-load_dotenv()
+#load_dotenv() #Used for local development
 key = os.environ.get('OPENCAGE_API_KEY')
 if not key:
     raise ValueError("Missing API key.")
