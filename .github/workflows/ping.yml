@@ -1,0 +1,13 @@
+name: Keep Streamlit App Awake
+
+on:
+  schedule:
+    - cron: "0 * * * *"  # Every hour on the hour UTC
+  workflow_dispatch:     # Allows you to manually run it too
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Curl your Streamlit app
+        run: curl -s https://iracetoomuch.streamlit.app/
