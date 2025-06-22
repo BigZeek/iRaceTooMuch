@@ -190,7 +190,15 @@ st.map(track_df)
 session_data = pd.read_excel(dl.racing_data, 'Raw driving data')
 grouped = driving_data.groupby("Session type")
 total_session_laps = grouped["Laps driven"].sum().sort_values(ascending=False)
-st.dataframe(total_session_laps)
+session_counts = session_data['Session type'].value_counts()
+
+combined_session_data = pd.concat(
+        [total_session_laps.rename("Total Laps"), session_counts.rename("Session Count")],
+        axis=1
+)
+
+combined_session_data = combined_session_data.sort_values("Total Laps", ascending=False)
+st.dataframe(combined_session_data)
 
 st.bar_chart(total_session_laps)
 
