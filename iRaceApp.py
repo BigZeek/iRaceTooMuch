@@ -172,7 +172,7 @@ match most_driven_car:
         case "Mercedes-AMG GT4":
                 car_image_string = "assets/Mercedes-AMG-GT4-1024x576.jpg"
         case "Chevrolet Corvette Z06 GT3.R":
-                car_image_string = "assets\chevrolet-corvette-z06-gt3r-feature-1024x576.jpg"
+                car_image_string = "assets/chevrolet-corvette-z06-gt3r-feature-1024x576.jpg"
         case "_":
                 st.write("No Available Image")
 
